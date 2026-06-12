@@ -154,12 +154,11 @@ create trigger set_updated_at_consultations
 -- SEED: instituciones por default
 -- ============================================================
 insert into public.institutions (name, type, is_default) values
-  ('Hospital General', 'hospital', true),
-  ('Clínica Santa María', 'clinica', true),
-  ('Sanatorio Los Arcos', 'sanatorio', true),
-  ('Consultorio Particular', 'consultorio', true),
-  ('Hospital Posadas', 'hospital', true),
-  ('Clínica del Sol', 'clinica', true);
+  ('Hospital El Cruce', 'hospital', true),
+  ('Fundación Favaloro', 'hospital', true),
+  ('Hospital Británico', 'hospital', true),
+  ('Hospital CEMIC', 'hospital', true),
+  ('Hospital Blas Dubarry', 'hospital', true);
 
 -- ============================================================
 -- STORAGE: bucket para adjuntos médicos
