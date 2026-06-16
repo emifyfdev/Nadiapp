@@ -1,17 +1,19 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { differenceInYears, format, parseISO } from 'date-fns'
 import { Modal } from '@/components/ui/Modal'
 import { ConsultationForm } from '@/components/consultations/ConsultationForm'
+import { PatientForm } from '@/components/patients/PatientForm'
 import { uploadMedicalFile, saveAttachmentRecord, getSignedUrl } from '@/lib/storage'
-import type { Patient, Consultation, ConsultationFormData, Attachment } from '@/types'
+import type { Patient, Consultation, ConsultationFormData, PatientFormData, Attachment } from '@/types'
 
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   const [patient, setPatient] = useState<Patient | null>(null)
@@ -23,6 +25,9 @@ export default function PatientDetailPage() {
   const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null)
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [attachmentsLoading, setAttachmentsLoading] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [savingEdit, setSavingEdit] = useState(false)
+  const [deactivating, setDeactivating] = useState(false)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -39,6 +44,13 @@ export default function PatientDetailPage() {
   }, [id])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  useEffect(() => {
+    if (searchParams.get('newConsultation') === '1') {
+      setModalOpen(true)
+      router.replace(`/dashboard/patients/${id}`)
+    }
+  }, [searchParams, id, router])
 
   const handleCreateConsultation = async (data: ConsultationFormData) => {
     setSaving(true)
@@ -84,6 +96,49 @@ export default function PatientDetailPage() {
     }
   }
 
+  const handleUpdatePatient = async (data: PatientFormData) => {
+    setSavingEdit(true)
+    const { error } = await supabase.from('patients').update({
+      first_name: data.first_name,
+      last_name: data.last_name,
+      dni: data.dni || null,
+      birth_date: data.birth_date || null,
+      gender: data.gender || null,
+      email: data.email || null,
+      phone: data.phone || null,
+      address: data.address || null,
+      insurance_name: data.insurance_name || null,
+      insurance_number: data.insurance_number || null,
+      insurance_plan: data.insurance_plan || null,
+      allergies: data.allergies || null,
+      chronic_conditions: data.chronic_conditions || null,
+      previous_symptoms: data.previous_symptoms || null,
+      medications: data.medications || null,
+      notes: data.notes || null,
+    }).eq('id', id)
+
+    setSavingEdit(false)
+    if (!error) {
+      setEditModalOpen(false)
+      fetchData()
+    }
+  }
+
+  const handleDeactivate = async () => {
+    if (!confirm('¿Desactivar a este paciente? No se borra ningún dato, solo queda marcado como inactivo y no vas a poder crear nuevas consultas hasta reactivarlo.')) return
+    setDeactivating(true)
+    const { error } = await supabase.from('patients').update({ is_active: false }).eq('id', id)
+    setDeactivating(false)
+    if (!error) fetchData()
+  }
+
+  const handleReactivate = async () => {
+    setDeactivating(true)
+    const { error } = await supabase.from('patients').update({ is_active: true }).eq('id', id)
+    setDeactivating(false)
+    if (!error) fetchData()
+  }
+
   const openConsultation = async (c: Consultation) => {
     setSelectedConsultation(c)
     setAttachmentsLoading(true)
@@ -100,7 +155,7 @@ export default function PatientDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -118,27 +173,77 @@ export default function PatientDetailPage() {
         ← Volver a pacientes
       </button>
 
-      <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-        <div className="flex items-start justify-between">
+      {!patient.is_active && (
+        <div className="bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <p className="text-sm text-slate-600">
+            Este paciente está <strong>inactivo</strong>. No se pueden crear nuevas consultas hasta reactivarlo.
+          </p>
+          <button
+            onClick={handleReactivate}
+            disabled={deactivating}
+            className="px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 whitespace-nowrap self-start"
+          >
+            Reactivar
+          </button>
+        </div>
+      )}
+
+      <div className={`bg-white rounded-xl border p-6 mb-6 ${patient.is_active ? 'border-slate-200' : 'border-slate-200 opacity-75'}`}>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-semibold">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold shrink-0 ${patient.is_active ? 'bg-violet-100 text-violet-700' : 'bg-slate-200 text-slate-500'}`}>
               {patient.first_name[0]}{patient.last_name[0]}
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-slate-900">{patient.last_name}, {patient.first_name}</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl font-semibold text-slate-900">{patient.last_name}, {patient.first_name}</h1>
+                {!patient.is_active && (
+                  <span className="inline-flex px-2 py-0.5 rounded-full bg-slate-200 text-slate-500 text-xs font-medium">
+                    Inactivo
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-slate-500">
                 DNI {patient.dni || '—'}
-                {patient.birth_date && ` · ${differenceInYears(new Date(), parseISO(patient.birth_date))} años`}
+                {patient.birth_date && differenceInYears(new Date(), parseISO(patient.birth_date)) >= 0 &&
+                  ` · ${differenceInYears(new Date(), parseISO(patient.birth_date))} años`}
                 {patient.insurance_name && ` · ${patient.insurance_name}`}
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors whitespace-nowrap"
-          >
-            + Nueva consulta
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setEditModalOpen(true)}
+              className="px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors whitespace-nowrap"
+            >
+              Editar
+            </button>
+            {patient.is_active ? (
+              <button
+                onClick={handleDeactivate}
+                disabled={deactivating}
+                className="px-4 py-2 border border-red-200 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors whitespace-nowrap disabled:opacity-50"
+              >
+                Desactivar
+              </button>
+            ) : (
+              <button
+                onClick={handleReactivate}
+                disabled={deactivating}
+                className="px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors whitespace-nowrap disabled:opacity-50"
+              >
+                Reactivar
+              </button>
+            )}
+            <button
+              onClick={() => setModalOpen(true)}
+              disabled={!patient.is_active}
+              title={!patient.is_active ? 'Reactivá al paciente para poder agregar consultas' : undefined}
+              className="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              + Nueva consulta
+            </button>
+          </div>
         </div>
 
         {(patient.allergies || patient.chronic_conditions || patient.medications) && (
@@ -179,7 +284,7 @@ export default function PatientDetailPage() {
             <div
               key={c.id}
               onClick={() => openConsultation(c)}
-              className="bg-white rounded-xl border border-slate-200 p-5 cursor-pointer hover:border-teal-300 hover:shadow-sm transition-all"
+              className="bg-white rounded-xl border border-slate-200 p-5 cursor-pointer hover:border-violet-300 hover:shadow-sm transition-all"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -219,6 +324,38 @@ export default function PatientDetailPage() {
       </Modal>
 
       <Modal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        title="Editar paciente"
+        maxWidth="max-w-2xl"
+      >
+        <PatientForm
+          mode="edit"
+          defaultValues={{
+            first_name: patient.first_name,
+            last_name: patient.last_name,
+            dni: patient.dni || '',
+            birth_date: patient.birth_date || '',
+            gender: patient.gender || undefined,
+            email: patient.email || '',
+            phone: patient.phone || '',
+            address: patient.address || '',
+            insurance_name: patient.insurance_name || '',
+            insurance_number: patient.insurance_number || '',
+            insurance_plan: patient.insurance_plan || '',
+            allergies: patient.allergies || '',
+            chronic_conditions: patient.chronic_conditions || '',
+            previous_symptoms: patient.previous_symptoms || '',
+            medications: patient.medications || '',
+            notes: patient.notes || '',
+          }}
+          onSubmit={handleUpdatePatient}
+          onCancel={() => setEditModalOpen(false)}
+          isLoading={savingEdit}
+        />
+      </Modal>
+
+      <Modal
         open={!!selectedConsultation}
         onClose={() => setSelectedConsultation(null)}
         title={selectedConsultation?.reason || 'Consulta'}
@@ -252,7 +389,7 @@ export default function PatientDetailPage() {
             <div className="pt-4 border-t border-slate-100">
               <p className="text-xs font-medium text-slate-400 uppercase mb-2">Adjuntos</p>
               {attachmentsLoading ? (
-                <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
               ) : attachments.length === 0 ? (
                 <p className="text-sm text-slate-400">Sin archivos adjuntos</p>
               ) : (
@@ -261,7 +398,7 @@ export default function PatientDetailPage() {
                     <button
                       key={a.id}
                       onClick={() => handleViewAttachment(a.storage_path)}
-                      className="flex items-center gap-2 text-sm text-teal-700 hover:underline"
+                      className="flex items-center gap-2 text-sm text-violet-700 hover:underline"
                     >
                       📎 {a.file_name}
                     </button>

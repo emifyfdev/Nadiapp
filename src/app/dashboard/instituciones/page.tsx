@@ -27,7 +27,7 @@ const TYPE_LABELS: Record<InstitutionType, string> = {
   otro: 'Otro',
 }
 
-const DOT_COLORS = ['bg-teal-500', 'bg-blue-500', 'bg-purple-500', 'bg-amber-500', 'bg-pink-500', 'bg-cyan-500']
+const DOT_COLORS = ['bg-violet-500', 'bg-blue-500', 'bg-purple-500', 'bg-amber-500', 'bg-pink-500', 'bg-cyan-500']
 
 export default function InstitucionesPage() {
   const supabase = createClient()
@@ -90,7 +90,7 @@ export default function InstitucionesPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Instituciones</h1>
           <p className="text-slate-500 text-sm mt-1">
@@ -99,7 +99,7 @@ export default function InstitucionesPage() {
         </div>
         <button
           onClick={() => setModalOpen(true)}
-          className="px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors whitespace-nowrap"
+          className="px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors whitespace-nowrap self-start"
         >
           + Nueva institución
         </button>
@@ -107,7 +107,7 @@ export default function InstitucionesPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : institutions.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 text-center py-16 text-slate-400">
@@ -146,14 +146,14 @@ export default function InstitucionesPage() {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
             <input {...register('name', { required: true })}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               placeholder="Hospital Británico" />
             {errors.name && <p className="text-xs text-red-600 mt-1">Requerido</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
             <select {...register('type')}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-500">
               <option value="">Seleccionar...</option>
               {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
@@ -161,7 +161,7 @@ export default function InstitucionesPage() {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Dirección</label>
             <input {...register('address')}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               placeholder="Av. Corrientes 1234, CABA" />
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
@@ -170,7 +170,7 @@ export default function InstitucionesPage() {
               Cancelar
             </button>
             <button type="submit" disabled={saving}
-              className="px-6 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+              className="px-6 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50 flex items-center gap-2">
               {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
               Crear institución
             </button>

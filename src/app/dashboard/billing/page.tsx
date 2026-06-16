@@ -130,14 +130,14 @@ export default function BillingPage() {
     .reduce((acc: number, r: any) => acc + (r.billing_amount || 0), 0)
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Auditoría y facturación</h1>
           <p className="text-slate-500 text-sm mt-1">Revisá y exportá lo que corresponde facturar por institución</p>
         </div>
         <button onClick={exportCSV}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors">
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors self-start">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
               d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -176,10 +176,10 @@ export default function BillingPage() {
 
       {/* Resumen cards por institución */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-teal-600 rounded-xl p-4 text-white">
-          <p className="text-teal-100 text-xs mb-1">Total del período</p>
+        <div className="bg-violet-600 rounded-xl p-4 text-white">
+          <p className="text-violet-100 text-xs mb-1">Total del período</p>
           <p className="text-2xl font-semibold">${totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-teal-100 text-xs mt-1">{rows.length} consultas</p>
+          <p className="text-violet-100 text-xs mt-1">{rows.length} consultas</p>
         </div>
         <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
           <p className="text-amber-700 text-xs mb-1">Pendiente de facturar</p>
@@ -196,17 +196,17 @@ export default function BillingPage() {
       </div>
 
       {/* Tabla */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : rows.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <p className="text-sm">No hay consultas para este período y filtros</p>
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[560px]">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Fecha</th>

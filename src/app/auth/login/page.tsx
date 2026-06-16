@@ -1,15 +1,26 @@
 'use client'
 // src/app/auth/login/page.tsx
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
   const router = useRouter()
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        router.replace('/dashboard')
+      } else {
+        setCheckingSession(false)
+      }
+    })
+  }, [])
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -18,17 +29,20 @@ export default function LoginPage() {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: 'https://www.googleapis.com/auth/calendar.events',
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
       },
     })
     if (error) {
       setError('Error al iniciar sesión con Google. Intentá de nuevo.')
       setLoading(false)
     }
+  }
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
   }
 
   return (

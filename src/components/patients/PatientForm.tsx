@@ -50,9 +50,9 @@ function Field({ label, error, children, required }: {
   )
 }
 
-const inputClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-const selectClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-const textareaClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+const inputClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+const selectClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+const textareaClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
 
 export function PatientForm({ defaultValues, onSubmit, onCancel, isLoading, mode = 'create' }: Props) {
   const { register, handleSubmit, formState: { errors } } = useForm<PatientFormData>({
@@ -79,7 +79,7 @@ export function PatientForm({ defaultValues, onSubmit, onCancel, isLoading, mode
             <input {...register('dni')} className={inputClass} placeholder="12345678" />
           </Field>
           <Field label="Fecha de nacimiento" error={errors.birth_date?.message}>
-            <input type="date" {...register('birth_date')} className={inputClass} />
+            <input type="date" max={new Date().toISOString().slice(0, 10)} {...register('birth_date')} className={inputClass} />
           </Field>
           <Field label="Género" error={errors.gender?.message}>
             <select {...register('gender')} className={selectClass}>
@@ -157,7 +157,7 @@ export function PatientForm({ defaultValues, onSubmit, onCancel, isLoading, mode
         <button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-6 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {isLoading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
           {mode === 'create' ? 'Guardar paciente' : 'Actualizar paciente'}

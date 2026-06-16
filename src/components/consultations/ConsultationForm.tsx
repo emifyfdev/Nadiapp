@@ -46,8 +46,8 @@ function Field({ label, error, children }: {
   )
 }
 
-const inputClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-const textareaClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+const inputClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+const textareaClass = "w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
 
 export function ConsultationForm({
   patientId, patientName, defaultValues, onSubmit, onCancel, isLoading, onUploadFile
@@ -84,7 +84,7 @@ export function ConsultationForm({
 
       {/* Header info */}
       <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
+        <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-white text-xs font-semibold">
           {patientName.split(' ').map(n => n[0]).join('').slice(0, 2)}
         </div>
         <div>
@@ -101,7 +101,7 @@ export function ConsultationForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Institución *" error={errors.institution_id?.message}>
             <select {...register('institution_id')}
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white">
               <option value="">Seleccionar institución...</option>
               {institutions.map(i => (
                 <option key={i.id} value={i.id}>
@@ -187,7 +187,7 @@ export function ConsultationForm({
             <input type="file" accept=".pdf,.jpg,.jpeg,.png,.heic" onChange={handleFileChange}
               className="hidden" />
             {uploadingFile ? (
-              <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
             ) : (
               <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -208,7 +208,7 @@ export function ConsultationForm({
           Cancelar
         </button>
         <button type="submit" disabled={isLoading}
-          className="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+          className="px-6 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50 flex items-center gap-2">
           {isLoading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
           Guardar consulta
         </button>
