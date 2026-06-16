@@ -176,10 +176,10 @@ export default function BillingPage() {
 
       {/* Resumen cards por institución */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-slate-900 rounded-xl p-4 text-white">
-          <p className="text-slate-400 text-xs mb-1">Total del período</p>
+        <div className="bg-teal-600 rounded-xl p-4 text-white">
+          <p className="text-teal-100 text-xs mb-1">Total del período</p>
           <p className="text-2xl font-semibold">${totalAmount.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</p>
-          <p className="text-slate-400 text-xs mt-1">{rows.length} consultas</p>
+          <p className="text-teal-100 text-xs mt-1">{rows.length} consultas</p>
         </div>
         <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
           <p className="text-amber-700 text-xs mb-1">Pendiente de facturar</p>
@@ -199,7 +199,7 @@ export default function BillingPage() {
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : rows.length === 0 ? (
           <div className="text-center py-16 text-slate-400">

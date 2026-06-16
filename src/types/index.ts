@@ -86,6 +86,24 @@ export interface Consultation {
   patient?: Patient
 }
 
+export type AppointmentStatus = 'pendiente' | 'confirmado' | 'cancelado' | 'realizado'
+
+export interface Appointment {
+  id: string
+  doctor_id: string
+  patient_id: string
+  institution_id: string | null
+  scheduled_at: string
+  reason: string | null
+  status: AppointmentStatus
+  created_at: string
+  google_event_id: string | null
+  google_event_link: string | null
+  // joins opcionales
+  patient?: Patient
+  institution?: Institution
+}
+
 export interface Attachment {
   id: string
   consultation_id: string

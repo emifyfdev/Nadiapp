@@ -18,6 +18,7 @@ export default function LoginPage() {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        scopes: 'https://www.googleapis.com/auth/calendar.events',
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
