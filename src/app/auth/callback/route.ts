@@ -1,15 +1,15 @@
+// src/app/auth/callback/route.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
 
-  const response = NextResponse.redirect(`${origin}${next}`)
+  const response = NextResponse.redirect(`${origin}/dashboard`)
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=no_code`)
+    return NextResponse.redirect(`${origin}/auth/login?error=no_code`)
   }
 
   const supabase = createServerClient(
@@ -32,8 +32,8 @@ export async function GET(request: NextRequest) {
   const { error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error) {
-    console.error('OAuth callback error:', error)
-    return NextResponse.redirect(`${origin}/login?error=oauth_callback`)
+    console.error('OAuth callback error:', error.message)
+    return NextResponse.redirect(`${origin}/auth/login?error=oauth_callback`)
   }
 
   return response
